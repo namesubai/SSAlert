@@ -1,6 +1,6 @@
 platform :ios, '10.0'
 use_frameworks!
 target 'SSAlertSwiftDemo' do
-pod 'SSAlert/Swift', :path => '../../../SSAlert'
+pod 'SSAlertSwift', :path => '../../../SSAlert'
 pod 'SnapKit'
 end

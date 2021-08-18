@@ -10,14 +10,7 @@ Pod::Spec.new do |s|
   s.author             = { "subai" => "804663401@qq.com" }
   s.source       = { :git => "https://github.com/namesubai/SSAlert.git", :tag => "#{s.version}"}
   s.license      = "MIT"
-  s.subspec 'OC' do |oc|
-    oc.source_files = 'SSAlertOC', 'Sources/SSAlertOC/**/*.{h,m}'
-  end
-
-  s.subspec 'Swift' do |swift|
-      swift.source_files = "SSAlertSwift", "Sources/SSAlertSwift/**/*.swift"
-  end
-
+  s.source_files = 'Sources/SSAlertOC/**/*.{h,m}'
   s.requires_arc = true
 
 end

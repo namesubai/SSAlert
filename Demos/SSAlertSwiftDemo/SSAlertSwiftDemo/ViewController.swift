@@ -6,7 +6,7 @@
 //
 
 import UIKit
-import SSAlert
+import SSAlertSwift
 import SnapKit
 
 class CustomView: UIView {

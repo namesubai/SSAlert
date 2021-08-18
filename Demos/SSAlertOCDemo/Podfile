@@ -1,6 +1,6 @@
 platform :ios, '10.0'
 use_frameworks!
 target 'SSAlertOCDemo' do
-pod 'SSAlert/OC', :path => '../../../SSAlert'
+pod 'SSAlert', :path => '../../../SSAlert'
 pod 'Masonry'
 end
