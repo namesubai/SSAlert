@@ -11,6 +11,8 @@ SSAlert封装了动画部分，而且支持自定义动画。可以快速构建�
 - 支持自定义动画,动画隐藏回调
 - 支持模态视图弹窗，支持拖拽隐藏
 - 自带类似系统的弹窗UIAlertView,UIActionSheet
+# 效果图
+<img src="https://github.com/namesubai/SSAlert/blob/main/demo.gif" width = 20% height = 20% />
 # 使用
 ## 1.导入代码
 ### Objective-C项目
