@@ -73,7 +73,7 @@ open class SSAlertView: UIView {
                 maskType: BackgroundMaskType = .black,
                 canPanDimiss: Bool = true) {
         let animaionVC = SSAlertAnimationController()
-        self.init(customView: customView, onView: animaionVC.view)
+        self.init(customView: customView, onView: animaionVC.view, animation: animation, maskType: maskType)
         self.canPanDimiss = canPanDimiss
         self.fromViewController = fromViewController
         let nav = navigationControllerClass.init(rootViewController: animaionVC)
