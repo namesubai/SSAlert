@@ -65,7 +65,7 @@ open class SSAlertView: UIView {
         makeUI()
     }
     
-    /// 初始化（模态视图弹窗）
+    /// 初始化（模态视图弹窗),canPanDimiss: 是否支持拖拽消息
     public convenience init(customView: UIView,
                 fromViewController: UIViewController,
                 animation: SSAlertDefaultAnmation = SSAlertDefaultAnmation(state: .fromCenter),
