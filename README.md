@@ -13,25 +13,33 @@ SSAlert封装了动画部分，而且支持自定义动画。可以快速构建�
 - 自带类似系统的弹窗UIAlertView,UIActionSheet
 # 效果图
 <img src="https://github.com/namesubai/SSAlert/blob/main/demo.gif" width = 20% height = 20% />
+
 # 使用
+
 ## 1.导入代码
+
 ### Objective-C项目
+
 1. pod  'SSAlert'
 2. #import <SSAlert/SSAlert.h>
 ### Swift项目
+
 1. pod  'SSAlertSwift'
-1. import SSAlertSwift
+2. import SSAlertSwift
+
 ## 2.SSAlertView用法
+
 ### SSAlertView的初始化
+
 SSAlertView的初始化有两种，一种是普通弹窗，一种是模态视图弹窗，两种的区别在于，前者是弹出一个View，后者是弹窗一个UIViewController。当需要点击弹窗上按钮不关闭弹窗跳转界面时候，可以使用模态视图弹窗。
 
-普通弹窗初始化
+普通弹窗初始化:
 ```
  let customView = UIView()
  customView.frame = CGRect(x:0,y:0,width:200,height:200)
  let alertView = SSAlertView(customView: customView, onView: navigationController!.view)
 ```
-模态视图弹窗初始化
+模态视图弹窗初始化:
 ```
 let customView = UIView()
 customView.frame = CGRect(x:0,y:0,width:200,height:200)
