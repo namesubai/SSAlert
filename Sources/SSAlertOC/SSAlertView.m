@@ -76,6 +76,11 @@ navigationControllerClass:(Class)navigationControllerClass
             self.masktype = masktype;
             self.showPanDimissGestrue = showPanDimissGestrue;
             SSAlertViewAnimationController *animationVC = [[SSAlertViewAnimationController alloc]init];
+            UIViewController * superVC = [self superViewController:customView];
+            if (superVC != nil) {
+                [animationVC addChildViewController:superVC];
+                [superVC didMoveToParentViewController:animationVC];
+            }
             UINavigationController *nav = [(UINavigationController *)[navigationControllerClass alloc]initWithRootViewController:animationVC];
             nav.modalPresentationStyle = UIModalPresentationCustom;
             self.navigationController = nav;
@@ -263,6 +268,18 @@ navigationControllerClass:(Class)navigationControllerClass
             [self hideView:YES];
         }
     }
+}
+
+- (UIViewController *)superViewController:(UIView *)view {
+    UIResponder * next = view.nextResponder;
+    while (next != nil) {
+        if ([next isKindOfClass: [UIViewController class]]) {
+            return (UIViewController *)next;
+        } else {
+            next = next.nextResponder;
+        }
+    }
+    return  nil;
 }
 
 - (void)observeHideCompletion:(void (^)(void))hideCompletion {

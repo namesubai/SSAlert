@@ -74,6 +74,10 @@ open class SSAlertView: UIView {
                 canPanDimiss: Bool = true) {
         let animaionVC = SSAlertAnimationController()
         self.init(customView: customView, onView: animaionVC.view, animation: animation, maskType: maskType)
+        if let superViewController = superViewController(view: customView) {
+            animaionVC.addChild(superViewController)
+            superViewController.didMove(toParent: animaionVC)
+        }
         self.canPanDimiss = canPanDimiss
         self.fromViewController = fromViewController
         let nav = navigationControllerClass.init(rootViewController: animaionVC)
@@ -244,6 +248,18 @@ open class SSAlertView: UIView {
                 hideView(animated: isTouchMaskHideAnimated ?? false)
             }
         }
+    }
+    
+    private func superViewController(view: UIView) -> UIViewController?  {
+        var next = view.next
+        while next != nil {
+            if next is UIViewController {
+                return next as? UIViewController
+            } else {
+                next = next!.next
+            }
+        }
+        return nil
     }
     
     public func observeHideCompletion(completion: (() -> Void)?) {
