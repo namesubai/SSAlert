@@ -77,7 +77,7 @@ navigationControllerClass:(Class)navigationControllerClass
             self.showPanDimissGestrue = showPanDimissGestrue;
             SSAlertViewAnimationController *animationVC = [[SSAlertViewAnimationController alloc]init];
             UIViewController * superVC = [self superViewController:customView];
-            if (superVC != nil) {
+            if (superVC != nil && superVC != animationVC) {
                 [animationVC addChildViewController:superVC];
                 [superVC didMoveToParentViewController:animationVC];
             }

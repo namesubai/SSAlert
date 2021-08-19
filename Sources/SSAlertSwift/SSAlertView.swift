@@ -74,7 +74,7 @@ open class SSAlertView: UIView {
                 canPanDimiss: Bool = true) {
         let animaionVC = SSAlertAnimationController()
         self.init(customView: customView, onView: animaionVC.view, animation: animation, maskType: maskType)
-        if let superViewController = superViewController(view: customView) {
+        if let superViewController = superViewController(view: customView), superViewController != animaionVC {
             animaionVC.addChild(superViewController)
             superViewController.didMove(toParent: animaionVC)
         }
