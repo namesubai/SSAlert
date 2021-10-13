@@ -55,7 +55,7 @@ open class SSAlertView: UIView {
     /// 初始化（普通视图弹窗）
     public init(customView: UIView,
                 onView: UIView,
-                animation: SSAlertDefaultAnmation = SSAlertDefaultAnmation(state: .fromCenter),
+                animation: SSAlertAnimation = SSAlertDefaultAnmation(state: .fromCenter),
                 maskType: BackgroundMaskType = .black) {
         self.animation = animation
         self.onView = onView
@@ -68,7 +68,7 @@ open class SSAlertView: UIView {
     /// 初始化（模态视图弹窗),canPanDimiss: 是否支持拖拽消息
     public convenience init(customView: UIView,
                 fromViewController: UIViewController,
-                animation: SSAlertDefaultAnmation = SSAlertDefaultAnmation(state: .fromCenter),
+                animation: SSAlertAnimation = SSAlertDefaultAnmation(state: .fromCenter),
                 navigationControllerClass: UINavigationController.Type = UINavigationController.self,
                 maskType: BackgroundMaskType = .black,
                 canPanDimiss: Bool = true) {
