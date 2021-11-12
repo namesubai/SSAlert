@@ -44,11 +44,17 @@ open class SSAlertView: UIView {
     /// 模态视图弹窗才有
     public private(set) weak var navigationController: UINavigationController?
     
+    public var isHideStatusBar = false {
+        didSet {
+            self.toViewContrller?.isHideStatusBar = isHideStatusBar
+        }
+    }
+    
     private var onView: UIView
     public private(set)  var maskType: BackgroundMaskType
     public private(set) var customView: UIView
     private weak var fromViewController: UIViewController?
-    private weak var toViewContrller: UIViewController?
+    private weak var toViewContrller: SSAlertAnimationController?
     private var presentAnimation: SSAlertPresentAnimation?
     private var canPanDimiss: Bool = false
     private var hideCompletion: (() -> Void)? = nil
@@ -74,6 +80,7 @@ open class SSAlertView: UIView {
                 canPanDimiss: Bool = true) {
         let animaionVC = SSAlertAnimationController()
         self.init(customView: customView, onView: animaionVC.view, animation: animation, maskType: maskType)
+        animaionVC.isHideStatusBar = self.isHideStatusBar
         if let superViewController = superViewController(view: customView), superViewController != animaionVC {
             animaionVC.addChild(superViewController)
             superViewController.didMove(toParent: animaionVC)
@@ -271,5 +278,6 @@ open class SSAlertView: UIView {
     }
     
 }
+
 
 
