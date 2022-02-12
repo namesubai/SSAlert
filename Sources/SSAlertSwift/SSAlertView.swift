@@ -187,7 +187,7 @@ open class SSAlertView: UIView {
         /// UIModalPresentationOverCurrentContext和 UIModalPresentationCurrentContext的区别是弹出的界面，前者不会把底部的视图stact移除，后者则会。
         self.navigationController?.definesPresentationContext = true
         self.navigationController?.modalPresentationStyle = .overCurrentContext
-        self.fromViewController?.present(self.navigationController!, animated: animated, completion: nil)
+        self.fromViewController?.present(self.navigationController!, animated: true, completion: nil)
         if canPanDimiss {
             dimissViewDragToHideAnimation(animated: animated)
         }

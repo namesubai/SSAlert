@@ -2,7 +2,7 @@
 
 Pod::Spec.new do |s|
   s.name         = "SSAlertSwift"
-  s.version      = "0.0.5"
+  s.version      = "0.0.6"
   s.summary      = "快速构建弹窗"
   s.platform     = :ios, "9.0"
   s.swift_versions = "5.0"
