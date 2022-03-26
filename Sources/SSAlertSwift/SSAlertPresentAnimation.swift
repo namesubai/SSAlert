@@ -37,6 +37,8 @@ class SSCustomInteractiveAnimation: UIPercentDrivenInteractiveTransition {
             cancelProgress = tCancelProgress
         }
         switch pan.state {
+        case .began:
+            pan.setTranslation(CGPoint(x: 0, y: 0), in: view)
         case .changed:
             update(progress)
         case .cancelled:

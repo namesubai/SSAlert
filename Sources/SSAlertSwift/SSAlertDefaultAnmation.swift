@@ -122,7 +122,7 @@ extension SSAlertDefaultAnmation: SSAlertAnimation {
     
     public func hideAnimationOfAnimationView(animationView: SSAlertView, viewSize: CGSize, animated: Bool, completion: (((Bool) -> Bool))?) {
         self.animationView = animationView
-        animation(animated: animated, animations: {
+        animation(animated: animated, isSpringAnimation: false, animations: {
             if self.state == .fromCenter {
                 animationView.alpha = 0
             } else {
