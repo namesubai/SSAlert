@@ -6,17 +6,21 @@
 //
 
 import Foundation
-typealias PanDimissAnimation = (CGPoint, CGRect) -> CGFloat
+
+typealias PanDimissAnimation = (CGPoint, CGRect) -> (PanProgress, PanCancelProgress)
+typealias DimissAnimation = (DimissIsCancel) -> Void
 
 class SSCustomInteractiveAnimation: UIPercentDrivenInteractiveTransition {
     private(set) var panGestureRecognizer: UIPanGestureRecognizer
     private var panDimissAnimation: PanDimissAnimation?
+    private var dimissAnimation: DimissAnimation?
 
-    init(panGestureRecognizer: UIPanGestureRecognizer,  panDimissAnimation: PanDimissAnimation?
-) {
+    init(panGestureRecognizer: UIPanGestureRecognizer,  panDimissAnimation: PanDimissAnimation?, dimissAnimation: DimissAnimation?) {
         self.panGestureRecognizer = panGestureRecognizer
         self.panDimissAnimation = panDimissAnimation
+        self.dimissAnimation = dimissAnimation
         super.init()
+        self.completionSpeed = 0.2
         panGestureRecognizer.addTarget(self, action: #selector(panAction(pan:)))
     }
     
@@ -26,8 +30,11 @@ class SSCustomInteractiveAnimation: UIPercentDrivenInteractiveTransition {
         }
         let poin = pan.translation(in: view)
         var progress: CGFloat = 0
+        var cancelProgress: CGFloat = 0.4
         if let panDimissAnimation = self.panDimissAnimation {
-            progress = panDimissAnimation(poin, pan.view!.frame)
+            let (tProgress, tCancelProgress) = panDimissAnimation(poin, pan.view!.frame)
+            progress = tProgress
+            cancelProgress = tCancelProgress
         }
         switch pan.state {
         case .changed:
@@ -35,10 +42,12 @@ class SSCustomInteractiveAnimation: UIPercentDrivenInteractiveTransition {
         case .cancelled:
             cancel()
         case .ended:
-            if progress > 0.4 {
+            if progress > cancelProgress {
                 finish()
+                dimissAnimation?(false)
             } else {
                 cancel()
+                dimissAnimation?(true)
             }
         default:
             break
@@ -61,6 +70,8 @@ class SSAlertPresentAnimation: NSObject {
     private var hideAnimation: AnimationCompletion? = nil
     private var endCompletion: AnimationCompletion? = nil
     private var panDimissAnimation: PanDimissAnimation? = nil
+    private var dimissAnimation: DimissAnimation? = nil
+
     private var transitionContext: UIViewControllerContextTransitioning?
     private weak var nav: UINavigationController?
     private weak var animationView: UIView?
@@ -87,7 +98,11 @@ class SSAlertPresentAnimation: NSObject {
         }
     }
     
-    func animationCompletion(showAnimation: AnimationCompletion? = nil, hideAnimation: AnimationCompletion? = nil, endCompletion: AnimationCompletion? = nil, panDimissAnimation: PanDimissAnimation? = nil) {
+    func animationCompletion(showAnimation: AnimationCompletion? = nil,
+                             hideAnimation: AnimationCompletion? = nil,
+                             endCompletion: AnimationCompletion? = nil,
+                             panDimissAnimation: PanDimissAnimation? = nil,
+                             dimissAnimation: DimissAnimation? = nil) {
         if showAnimation != nil {
             self.showAnimation = showAnimation
         }
@@ -101,7 +116,13 @@ class SSAlertPresentAnimation: NSObject {
         if panDimissAnimation != nil {
             self.panDimissAnimation = panDimissAnimation
         }
+        if panDimissAnimation != nil {
+            self.panDimissAnimation = panDimissAnimation
+        }
         
+        if dimissAnimation != nil {
+            self.dimissAnimation = dimissAnimation
+        }
     }
     
     @discardableResult
@@ -134,14 +155,14 @@ extension SSAlertPresentAnimation: UIViewControllerTransitioningDelegate {
     
     func interactionControllerForDismissal(using animator: UIViewControllerAnimatedTransitioning) -> UIViewControllerInteractiveTransitioning? {
         if self.panGestureRecognizer != nil {
-            return SSCustomInteractiveAnimation(panGestureRecognizer: self.panGestureRecognizer!, panDimissAnimation: self.panDimissAnimation)
+            return SSCustomInteractiveAnimation(panGestureRecognizer: self.panGestureRecognizer!, panDimissAnimation: self.panDimissAnimation, dimissAnimation: dimissAnimation)
         }
         return nil
     }
     func interactionControllerForPresentation(using animator: UIViewControllerAnimatedTransitioning) -> UIViewControllerInteractiveTransitioning? {
         if self.panGestureRecognizer != nil {
             
-            return SSCustomInteractiveAnimation(panGestureRecognizer: self.panGestureRecognizer!, panDimissAnimation: self.panDimissAnimation)
+            return SSCustomInteractiveAnimation(panGestureRecognizer: self.panGestureRecognizer!, panDimissAnimation: self.panDimissAnimation, dimissAnimation: dimissAnimation)
         }
         return nil
     }

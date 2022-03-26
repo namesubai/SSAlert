@@ -231,8 +231,10 @@ open class SSAlertView: UIView {
                 hideCompletion()
             }
         }, panDimissAnimation: { [weak self] point, frame in
-             guard let self = self else { return 0 }
+            guard let self = self else { return (0, 0.4) }
             return self.animation.panToDimissTransilatePoint(point: point, panViewFrame: frame)
+        }, dimissAnimation: { [weak self] isCancel in guard let self = self else { return }
+            self.toViewContrller?.isDimiss = !isCancel
         })
         self.presentAnimation?.duration = animation.animationDuration()
     }

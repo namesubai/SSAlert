@@ -9,7 +9,7 @@ import Foundation
 
 
 class SSAlertAnimationController: UIViewController {
-    private var isDimiss: Bool = false
+    var isDimiss: Bool = false
     var isHideStatusBar = false {
         didSet {
             setNeedsStatusBarAppearanceUpdate()

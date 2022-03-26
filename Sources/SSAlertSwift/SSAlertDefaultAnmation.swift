@@ -187,7 +187,7 @@ extension SSAlertDefaultAnmation: SSAlertAnimation {
         }
     }
     
-    public func panToDimissTransilatePoint(point: CGPoint, panViewFrame: CGRect) -> CGFloat {
+    public func panToDimissTransilatePoint(point: CGPoint, panViewFrame: CGRect) -> (PanProgress, PanCancelProgress) {
         var progress: CGFloat = 0
         switch state {
         case .fromTop:
@@ -211,6 +211,6 @@ extension SSAlertDefaultAnmation: SSAlertAnimation {
         case .fromCenter:
             progress = abs(point.y / panViewFrame.height)
         }
-        return progress
+        return (progress, 0.4)
     }
 }

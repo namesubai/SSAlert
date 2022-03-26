@@ -6,7 +6,9 @@
 //
 
 import Foundation
-
+public typealias PanProgress = CGFloat
+public typealias PanCancelProgress = CGFloat
+public typealias DimissIsCancel = Bool
 public protocol SSAlertAnimation {
     /// 动画时间
     func animationDuration() -> TimeInterval
@@ -17,6 +19,6 @@ public protocol SSAlertAnimation {
     /// 刷新大小动画
     func refreshAnimationOfAnimationView(animationView: SSAlertView, viewSize: CGSize, animated: Bool, completion:(((Bool) -> Void))?)
     /// 拖拽隐藏动画，当是模态视图弹窗才有
-    func panToDimissTransilatePoint(point: CGPoint, panViewFrame: CGRect) -> CGFloat
+    func panToDimissTransilatePoint(point: CGPoint, panViewFrame: CGRect) -> (PanProgress, PanCancelProgress)
 }
 
