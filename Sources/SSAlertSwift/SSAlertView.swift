@@ -208,6 +208,7 @@ open class SSAlertView: UIView {
         })
         self.presentAnimation?.duration = animation.animationDuration()
         self.toViewContrller?.dismiss(animated: animated, completion: {
+            [weak self] in guard let self = self else { return }
             if let hideCompletion = self.hideCompletion {
                 hideCompletion()
             }

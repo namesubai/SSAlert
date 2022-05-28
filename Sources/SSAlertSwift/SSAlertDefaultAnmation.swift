@@ -21,7 +21,7 @@ public class SSAlertDefaultAnmation: NSObject {
     public var duration: TimeInterval = 0.3
     /// 展示动画是否开启弹簧效果
     public var isSpringShowAnimation: Bool = true
-    private var animationView: SSAlertView? = nil
+    private weak var animationView: SSAlertView? = nil
     public init(state: State) {
         self.state = state
         super.init()
@@ -138,6 +138,7 @@ extension SSAlertDefaultAnmation: SSAlertAnimation {
             if finished && !isCancel {
                 animationView.removeFromSuperview()
                 animationView.backgroundMask?.removeFromSuperview()
+                self.animationView = nil
             }
         })
     }
