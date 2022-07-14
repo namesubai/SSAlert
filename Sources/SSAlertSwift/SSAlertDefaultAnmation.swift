@@ -137,7 +137,7 @@ extension SSAlertDefaultAnmation: SSAlertAnimation {
             if let completion = completion {
                 isCancel = completion(finished)
             }
-            if finished && !isCancel {
+            if !isCancel {
                 animationView.removeFromSuperview()
                 animationView.backgroundMask?.removeFromSuperview()
                 self.animationView = nil
