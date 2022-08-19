@@ -20,6 +20,12 @@ extension SSAlertView {
     }
 }
 
+fileprivate extension SSAlertView {
+    typealias  HideCompletion = () -> Void
+    class HideCompletionData: NSObject {
+        var completion: HideCompletion?
+    }
+}
 
 open class SSAlertView: UIView {
     /// customView 的内间距
@@ -42,7 +48,7 @@ open class SSAlertView: UIView {
     public var isTouchMaskHideAnimated: Bool? = nil
     
     /// 模态视图弹窗才有
-    public private(set) weak var navigationController: UINavigationController?
+    public private(set) var navigationController: UINavigationController?
     
     public var isHideStatusBar = false {
         didSet {
@@ -57,7 +63,7 @@ open class SSAlertView: UIView {
     private weak var toViewContrller: SSAlertAnimationController?
     private var presentAnimation: SSAlertPresentAnimation?
     private var canPanDimiss: Bool = false
-    private var hideCompletion: (() -> Void)? = nil
+    private var hideCompletions = [HideCompletionData]()
     /// 初始化（普通视图弹窗）
     public init(customView: UIView,
                 onView: UIView,
@@ -73,11 +79,11 @@ open class SSAlertView: UIView {
     
     /// 初始化（模态视图弹窗),canPanDimiss: 是否支持拖拽消息
     public convenience init(customView: UIView,
-                fromViewController: UIViewController,
-                animation: SSAlertAnimation = SSAlertDefaultAnmation(state: .fromCenter),
-                navigationControllerClass: UINavigationController.Type = UINavigationController.self,
-                maskType: BackgroundMaskType = .black,
-                canPanDimiss: Bool = true) {
+                            fromViewController: UIViewController,
+                            animation: SSAlertAnimation = SSAlertDefaultAnmation(state: .fromCenter),
+                            navigationControllerClass: UINavigationController.Type = UINavigationController.self,
+                            maskType: BackgroundMaskType = .black,
+                            canPanDimiss: Bool = true) {
         let animaionVC = SSAlertAnimationController()
         self.init(customView: customView, onView: animaionVC.view, animation: animation, maskType: maskType)
         animaionVC.isHideStatusBar = self.isHideStatusBar
@@ -124,51 +130,57 @@ open class SSAlertView: UIView {
         onView.addSubview(self)
     }
     /// 展示
-    public func show(animated: Bool = true) {
+    public func show(animated: Bool = true, completion: (() -> Void)? = nil) {
         if navigationController != nil {
-            presentView(animated: animated)
+            presentView(animated: animated, completion: completion)
         } else {
-            showView(animated: animated)
+            showView(animated: animated, completion: completion)
         }
     }
     /// 隐藏
-    public func hide(animated: Bool = true) {
+    public func hide(animated: Bool = true, completion: (() -> Void)? = nil) {
         if navigationController != nil {
-            dimissView(animated: animated)
+            dimissView(animated: animated, completion: completion)
         } else {
-            hideView(animated: animated)
+            hideView(animated: animated, completion: completion)
         }
     }
     
     /// 展示（普通视图弹窗）
     /// - Parameter animated: 是否动画
-    private func showView(animated: Bool = true) {
+    private func showView(animated: Bool = true, completion: (() -> Void)? = nil) {
         isTouchMaskHideAnimated = animated
         var customSize = customView.systemLayoutSizeFitting(UIView.layoutFittingExpandedSize)
         if customView.ss_size != .zero {
             customSize = customView.ss_size
         }
         let size = CGSize(width: customSize.width + customEdgeInsets.left + customEdgeInsets.right, height: customSize.height + customEdgeInsets.top + customEdgeInsets.bottom)
-        animation.showAnimationOfAnimationView(animationView: self, viewSize: size, animated: animated, completion: nil)
+        animation.showAnimationOfAnimationView(animationView: self, viewSize: size, animated: animated, completion: { _ in completion?() })
     }
     /// 隐藏（普通视图弹窗）
     /// - Parameter animated: 是否动画
-    private func hideView(animated: Bool = true) {
+    private func hideView(animated: Bool = true, completion: (() -> Void)? = nil) {
         var customSize = customView.systemLayoutSizeFitting(UIView.layoutFittingExpandedSize)
         if customView.ss_size != .zero {
             customSize = customView.ss_size
         }
         let size = CGSize(width: customSize.width + customEdgeInsets.left + customEdgeInsets.right, height: customSize.height + customEdgeInsets.top + customEdgeInsets.bottom)
-        animation.hideAnimationOfAnimationView(animationView: self, viewSize: size, animated: animated) { _ in
+        animation.hideAnimationOfAnimationView(animationView: self, viewSize: size, animated: animated) { [weak self] _ in guard let self = self else {  return false }
+            completion?()
+            
+            self.hideCompletions.forEach { hideC in
+                hideC.completion?()
+                hideC.completion = nil
+                self.hideCompletions.removeAll(where: {$0 == hideC})
+            }
+            
             return false
         }
-        if let hideCompletion = hideCompletion {
-            hideCompletion()
-        }
+        
     }
     /// 展示（模态视图弹窗）
     /// - Parameter animated: 是否动画
-    private func presentView(animated: Bool = true) {
+    private func presentView(animated: Bool = true, completion: (() -> Void)? = nil) {
         isTouchMaskHideAnimated = animated
         var customSize = customView.systemLayoutSizeFitting(UIView.layoutFittingExpandedSize)
         if customView.ss_size != .zero {
@@ -179,6 +191,7 @@ open class SSAlertView: UIView {
             [weak self] in guard let self = self else { return }
             self.animation.showAnimationOfAnimationView(animationView: self, viewSize: size, animated: animated) { _ in
                 self.presentAnimation?.setCompleteTransitionIsHide(isHide: false)
+                completion?()
             }
         })
         self.presentAnimation?.duration = animation.animationDuration()
@@ -194,7 +207,7 @@ open class SSAlertView: UIView {
     }
     /// 隐藏（模态视图弹窗）
     /// - Parameter animated: 是否动画
-    private func dimissView(animated: Bool = true) {
+    private func dimissView(animated: Bool = true, completion: (() -> Void)? = nil) {
         var customSize = customView.systemLayoutSizeFitting(UIView.layoutFittingExpandedSize)
         if customView.ss_size != .zero {
             customSize = customView.ss_size
@@ -209,8 +222,11 @@ open class SSAlertView: UIView {
         self.presentAnimation?.duration = animation.animationDuration()
         self.toViewContrller?.dismiss(animated: animated, completion: {
             [weak self] in guard let self = self else { return }
-            if let hideCompletion = self.hideCompletion {
-                hideCompletion()
+            completion?()
+            self.hideCompletions.forEach { hideC in
+                hideC.completion?()
+                hideC.completion = nil
+                self.hideCompletions.removeAll(where: {$0 == hideC})
             }
         })
     }
@@ -228,8 +244,10 @@ open class SSAlertView: UIView {
             }
         },endCompletion: {
             [weak self] in guard let self = self else { return }
-            if let hideCompletion = self.hideCompletion {
-                hideCompletion()
+            self.hideCompletions.forEach { hideC in
+                hideC.completion?()
+                hideC.completion = nil
+                self.hideCompletions.removeAll(where: {$0 == hideC})
             }
         }, panDimissAnimation: { [weak self] point, frame in
             guard let self = self else { return (0, 0.4) }
@@ -273,7 +291,9 @@ open class SSAlertView: UIView {
     }
     
     public func observeHideCompletion(completion: (() -> Void)?) {
-        self.hideCompletion = completion
+        let completionData = HideCompletionData()
+        completionData.completion = completion
+        self.hideCompletions.append(completionData)
     }
     
     required public init?(coder: NSCoder) {
@@ -281,6 +301,7 @@ open class SSAlertView: UIView {
     }
     
 }
+
 
 
 
