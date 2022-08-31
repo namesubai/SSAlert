@@ -55,7 +55,11 @@ open class SSAlertView: UIView {
             self.toViewContrller?.isHideStatusBar = isHideStatusBar
         }
     }
-    
+    public var isShowNavWhenViewWillDisappear = true {
+        didSet {
+            self.toViewContrller?.isShowNavWhenViewWillDisappear = isShowNavWhenViewWillDisappear
+        }
+    }
     private var onView: UIView
     public private(set)  var maskType: BackgroundMaskType
     public private(set) var customView: UIView
@@ -301,6 +305,7 @@ open class SSAlertView: UIView {
     }
     
 }
+
 
 
 

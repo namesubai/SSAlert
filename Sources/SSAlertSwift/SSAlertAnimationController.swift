@@ -15,6 +15,7 @@ class SSAlertAnimationController: UIViewController {
             setNeedsStatusBarAppearanceUpdate()
         }
     }
+    var isShowNavWhenViewWillDisappear = true
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .clear
@@ -31,7 +32,7 @@ class SSAlertAnimationController: UIViewController {
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        if !isDimiss {
+        if !isDimiss, isShowNavWhenViewWillDisappear {
             navigationController?.setNavigationBarHidden(false, animated: animated)
         }
     }
@@ -41,4 +42,5 @@ class SSAlertAnimationController: UIViewController {
         isDimiss = true
     }
 }
+
 
