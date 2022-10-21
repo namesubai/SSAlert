@@ -23,6 +23,8 @@ open class SSAlertDefaultAnmation: NSObject {
     public var isSpringShowAnimation: Bool = true
     /// 滑动消失距离触发
     public var panDimissProgress: CGFloat = 0.4
+    public var usingSpringWithDamping: CGFloat = 0.8
+    public var initialSpringVelocity: CGFloat = 0.5
     private weak var animationView: SSAlertView? = nil
     public init(state: State) {
         self.state = state
@@ -34,8 +36,8 @@ open class SSAlertDefaultAnmation: NSObject {
             if isSpringAnimation {
                 UIView.animate(withDuration: animationDuration(),
                                delay: 0,
-                               usingSpringWithDamping: 0.8,
-                               initialSpringVelocity: 0.5,
+                               usingSpringWithDamping: usingSpringWithDamping,
+                               initialSpringVelocity: initialSpringVelocity,
                                options: [],
                                animations: animations,
                                completion: completion)
@@ -78,33 +80,33 @@ extension SSAlertDefaultAnmation: SSAlertAnimation {
         switch state {
             case .fromBottom:
                 animationView.ss_centerX = animationSuperView.ss_w / 2 + centerOffset.x
-                animationView.ss_y = animationSuperView.ss_h + centerOffset.y
-                animation(animated: animated, isSpringAnimation: isSpringShowAnimation, animations: {
-                    animationView.transform = CGAffineTransform.init(translationX: 0, y: -animationView.ss_h)
+                animationView.ss_y = animationSuperView.ss_h
+                animation(animated: animated, isSpringAnimation: isSpringShowAnimation, animations: { [weak self] in guard let self = self else { return }
+                    animationView.transform = CGAffineTransform.init(translationX: 0, y: -animationView.ss_h + self.centerOffset.y)
                     animationView.backgroundMask?.alpha = 1;
                 }, completion: completion)
                 
             case .fromTop:
                 animationView.ss_centerX = animationSuperView.ss_w / 2 + centerOffset.x
-                animationView.ss_y = -animationView.ss_h + centerOffset.y
-                animation(animated: animated, isSpringAnimation: isSpringShowAnimation, animations: {
-                    animationView.transform = CGAffineTransform.init(translationX: 0, y: animationView.ss_h)
+                animationView.ss_y = -animationView.ss_h
+                animation(animated: animated, isSpringAnimation: isSpringShowAnimation, animations: { [weak self] in guard let self = self else { return }
+                    animationView.transform = CGAffineTransform.init(translationX: 0, y: animationView.ss_h + self.centerOffset.y)
                     animationView.backgroundMask?.alpha = 1;
                 }, completion: completion)
                 
             case .fromLeft:
                 animationView.ss_centerY = animationSuperView.ss_h / 2 + centerOffset.y
-                animationView.ss_x = -animationView.ss_w + centerOffset.x
+                animationView.ss_x = -animationView.ss_w
                 animation(animated: animated, isSpringAnimation: isSpringShowAnimation, animations: {
-                    animationView.transform = CGAffineTransform.init(translationX: animationView.ss_w, y: 0)
+                    animationView.transform = CGAffineTransform.init(translationX: animationView.ss_w + self.centerOffset.x, y: 0)
                     animationView.backgroundMask?.alpha = 1;
                 }, completion: completion)
                 
             case .fromRight:
                 animationView.ss_centerY = animationSuperView.ss_h / 2 + centerOffset.y
-                animationView.ss_x = animationSuperView.ss_w + centerOffset.x
+                animationView.ss_x = animationSuperView.ss_w
                 animation(animated: animated, isSpringAnimation: isSpringShowAnimation, animations: {
-                    animationView.transform = CGAffineTransform.init(translationX: -animationView.ss_w, y: 0)
+                    animationView.transform = CGAffineTransform.init(translationX: -animationView.ss_w + self.centerOffset.x, y: 0)
                     animationView.backgroundMask?.alpha = 1;
                 }, completion: completion)
                 
@@ -217,4 +219,5 @@ extension SSAlertDefaultAnmation: SSAlertAnimation {
         return (progress, panDimissProgress)
     }
 }
+
 
