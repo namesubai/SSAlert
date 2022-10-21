@@ -158,7 +158,7 @@ extension SSAlertDefaultAnmation: SSAlertAnimation {
             case .fromBottom:
                 animationView.ss_centerX = animationSuperView.ss_w / 2.0 + centerOffset.x
                 animation(animated: animated, animations: {
-                    animationView.ss_y = animationSuperView.ss_h - viewSize.height - self.centerOffset.y
+                    animationView.ss_y = animationSuperView.ss_h - viewSize.height + self.centerOffset.y
                 }, completion: completion)
                 
             case .fromTop:
