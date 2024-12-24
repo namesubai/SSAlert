@@ -73,7 +73,7 @@ public extension UIView {
         }
         set {
             var frame = frame
-            frame.origin.y = newValue
+            frame.origin.y = newValue - frame.height
             self.frame = frame
         }
     }

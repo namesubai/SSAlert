@@ -48,7 +48,7 @@ open class SSAlertView: UIView {
     public var isTouchMaskHideAnimated: Bool? = nil
     
     /// 模态视图弹窗才有
-    public private(set) var navigationController: UINavigationController?
+    public weak private(set) var navigationController: UINavigationController?
     
     public var isHideStatusBar = false {
         didSet {
@@ -87,7 +87,8 @@ open class SSAlertView: UIView {
                             animation: SSAlertAnimation = SSAlertDefaultAnmation(state: .fromCenter),
                             navigationControllerClass: UINavigationController.Type = UINavigationController.self,
                             maskType: BackgroundMaskType = .black,
-                            canPanDimiss: Bool = true) {
+                            canPanDimiss: Bool = true,
+                            canTouchMaskHide: Bool = true) {
         let animaionVC = SSAlertAnimationController()
         self.init(customView: customView, onView: animaionVC.view, animation: animation, maskType: maskType)
         animaionVC.isHideStatusBar = self.isHideStatusBar
@@ -96,14 +97,15 @@ open class SSAlertView: UIView {
             superViewController.didMove(toParent: animaionVC)
         }
         self.canPanDimiss = canPanDimiss
+        self.canTouchMaskHide = canTouchMaskHide
         self.fromViewController = fromViewController
         let nav = navigationControllerClass.init(rootViewController: animaionVC)
         nav.modalPresentationStyle = .custom
         self.navigationController = nav
         self.canPanDimiss = canPanDimiss
         let animation = SSAlertPresentAnimation(navigationViewController: nav, animationView: customView, canPanDimiss: canPanDimiss)
-        self.navigationController!.transitioningDelegate = animation
-        self.navigationController!.modalPresentationCapturesStatusBarAppearance = true
+        self.navigationController?.transitioningDelegate = animation
+        self.navigationController?.modalPresentationCapturesStatusBarAppearance = true
         self.presentAnimation = animation
         self.toViewContrller = animaionVC
         
@@ -217,22 +219,26 @@ open class SSAlertView: UIView {
             customSize = customView.ss_size
         }
         let size = CGSize(width: customSize.width + customEdgeInsets.left + customEdgeInsets.right, height: customSize.height + customEdgeInsets.top + customEdgeInsets.bottom)
-        presentAnimation?.animationCompletion(hideAnimation: {
-            [weak self] in guard let self = self else { return }
-            self.animation.hideAnimationOfAnimationView(animationView: self, viewSize: size, animated: animated) { _ in
-                return self.presentAnimation!.setCompleteTransitionIsHide(isHide: true)
-            }
-        })
         self.presentAnimation?.duration = animation.animationDuration()
-        self.toViewContrller?.dismiss(animated: animated, completion: {
-            [weak self] in guard let self = self else { return }
-            completion?()
-            self.hideCompletions.forEach { hideC in
-                hideC.completion?()
-                hideC.completion = nil
-                self.hideCompletions.removeAll(where: {$0 == hideC})
+        /// 没动画时，不会走 presentAnimation里面的动画
+        if !animated {
+            self.toViewContrller?.dismiss(animated: animated, completion: nil)
+            self.animation.hideAnimationOfAnimationView(animationView: self, viewSize: size, animated: animated) { [weak self] _ in guard let self = self else { return true }
+                self.handleHideAction(completion: completion)
+                return false
             }
-        })
+        } else {
+            presentAnimation?.animationCompletion(hideAnimation: {
+                [weak self] in guard let self = self else { return }
+                self.animation.hideAnimationOfAnimationView(animationView: self, viewSize: size, animated: animated) { [weak self] _ in guard let self = self else { return true }
+                    return self.presentAnimation!.setCompleteTransitionIsHide(isHide: true)
+                }
+            })
+            self.toViewContrller?.dismiss(animated: animated, completion: {
+                [weak self] in guard let self = self else { return }
+                self.handleHideAction(completion: completion)
+            })
+        }
     }
     
     private func dimissViewDragToHideAnimation(animated: Bool) {
@@ -248,11 +254,7 @@ open class SSAlertView: UIView {
             }
         },endCompletion: {
             [weak self] in guard let self = self else { return }
-            self.hideCompletions.forEach { hideC in
-                hideC.completion?()
-                hideC.completion = nil
-                self.hideCompletions.removeAll(where: {$0 == hideC})
-            }
+            self.handleHideAction()
         }, panDimissAnimation: { [weak self] point, frame in
             guard let self = self else { return (0, 0.4) }
             return self.animation.panToDimissTransilatePoint(point: point, panViewFrame: frame)
@@ -270,7 +272,14 @@ open class SSAlertView: UIView {
         let size = CGSize(width: customSize.width + customEdgeInsets.left + customEdgeInsets.right, height: customSize.height + customEdgeInsets.top + customEdgeInsets.bottom)
         animation.refreshAnimationOfAnimationView(animationView: self, viewSize: size, animated: animated, completion: nil)
     }
-    
+    private func handleHideAction(completion: (() -> Void)? = nil) {
+        completion?()
+        self.hideCompletions.forEach { hideC in
+            hideC.completion?()
+            hideC.completion = nil
+            self.hideCompletions.removeAll(where: {$0 == hideC})
+        }
+    }
     
     @objc private func backgroundMaskAction() {
         if canTouchMaskHide {
@@ -305,6 +314,7 @@ open class SSAlertView: UIView {
     }
     
 }
+
 
 
 
